@@ -349,7 +349,7 @@ func recycleIPTables(nw ip.IP4Net, lease *subnet.Lease) error {
 	prevNetwork := ReadCIDRFromSubnetFile(opts.subnetFile, "FLANNEL_NETWORK")
 	prevSubnet := ReadCIDRFromSubnetFile(opts.subnetFile, "FLANNEL_SUBNET")
 	// recycle iptables rules only when network configured or subnet leased is not equal to current one.
-	if prevNetwork != nw && prevSubnet != lease.Subnet{
+	if prevNetwork != nw && prevSubnet != lease.Subnet {
 		log.Infof("Current network or subnet (%v, %v) is not equal to previous one (%v, %v), trying to recycle old iptables rules", nw, lease.Subnet, prevNetwork, prevSubnet)
 		lease := &subnet.Lease{
 			Subnet: prevSubnet,
@@ -377,6 +377,7 @@ func shutdownHandler(ctx context.Context, sigs chan os.Signal, cancel context.Ca
 }
 
 func getConfig(ctx context.Context, sm subnet.Manager) (*subnet.Config, error) {
+	ticker := time.NewTicker(1 * time.Second)
 	// Retry every second until it succeeds
 	for {
 		config, err := sm.GetNetworkConfig(ctx)
@@ -391,7 +392,7 @@ func getConfig(ctx context.Context, sm subnet.Manager) (*subnet.Config, error) {
 		select {
 		case <-ctx.Done():
 			return nil, errCanceled
-		case <-time.After(1 * time.Second):
+		case <-ticker.C:
 			fmt.Println("timed out")
 		}
 	}

@@ -157,11 +157,12 @@ func (n *RouteNetwork) removeFromRouteList(route netlink.Route) {
 }
 
 func (n *RouteNetwork) routeCheck(ctx context.Context) {
+	ticker := time.NewTicker(routeCheckRetries * time.Second)
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.After(routeCheckRetries * time.Second):
+		case <-ticker.C):
 			n.checkSubnetExistInRoutes()
 		}
 	}

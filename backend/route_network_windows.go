@@ -22,8 +22,9 @@ import (
 	"github.com/rakelkar/gonetsh/netroute"
 	"golang.org/x/net/context"
 
-	"github.com/coreos/flannel/subnet"
 	"strings"
+
+	"github.com/coreos/flannel/subnet"
 )
 
 const (
@@ -160,11 +161,12 @@ func (n *RouteNetwork) removeFromRouteList(oldRoute *netroute.Route) {
 }
 
 func (n *RouteNetwork) routeCheck(ctx context.Context) {
+	ticker := time.NewTicker(routeCheckRetries * time.Second)
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.After(routeCheckRetries * time.Second):
+		case <-ticker.C:
 			n.checkSubnetExistInRoutes()
 		}
 	}

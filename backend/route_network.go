@@ -162,7 +162,7 @@ func (n *RouteNetwork) routeCheck(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case <-ticker.C):
+		case <-ticker.C:
 			n.checkSubnetExistInRoutes()
 		}
 	}
